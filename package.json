@@ -1,14 +1,12 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sp500-sector-heatmap-worker",
-  "version": "2.0.0",
-  "private": true,
-  "description": "S&P 500 sector heatmap dashboard with dynamic market data served by Cloudflare Workers.",
-  "type": "module",
-  "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
-  },
-  "devDependencies": {
-    "wrangler": "^4.107.0"
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-09",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
   }
 }
