@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>S&P 500 Sector Heatmap Live</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <section class="hero">
+        <div class="eyebrow">Cloudflare Workers · datos dinámicos</div>
+        <h1>S&P 500 Sector Heatmap</h1>
+        <p class="subtitle">Dashboard interactivo de los 11 sectores GICS usando ETFs Select Sector SPDR como proxy. Los precios, YTD, 6M, 1Y y rango de 52 semanas se actualizan desde el Worker vía <code>/api/market</code>.</p>
+        <div class="source-row">
+          <span class="source-chip" id="data-chip">Cargando datos de mercado...</span>
+          <button class="refresh" id="refresh-btn" type="button">Actualizar ahora</button>
+        </div>
+      </section>
+      <aside class="market-card">
+        <div class="topline"><h2>Índices / proxies</h2><span class="source-chip compact">YTD dinámico</span></div>
+        <div class="pills" id="pills"></div>
+        <div class="legend"></div>
+        <div class="legend-labels"><span>Peor / rojo</span><span>Neutral</span><span>Mejor / verde</span></div>
+      </aside>
+    </header>
+
+    <div class="controls">
+      <span>Ordenar por:</span>
+      <button data-sort="ytd" class="active">YTD</button>
+      <button data-sort="oneY">1 año</button>
+      <button data-sort="weight">Peso</button>
+      <button data-sort="pe">P/E</button>
+      <button data-sort="divYield">Dividendo</button>
+    </div>
+
+    <main class="grid" id="grid"></main>
+    <div class="empty" id="empty">No hay sectores para mostrar.</div>
+
+    <footer>
+      <b>Notas de datos:</b> SPY, QQQ, IWM y ETFs sectoriales se usan como proxies líquidos para calcular precio, YTD, 6M, 1Y y rango de 52 semanas. La app intenta Yahoo Finance Chart y, si falla, usa Stooq EOD CSV como respaldo; si ambas fallan, muestra el <b>fallback estático</b> embebido (snapshot al cierre del 07-jul-2026 — retornos sectoriales de precio vía The Trading Tools; QQQ/IWM retorno total al 02-jul vía Total Real Returns; rangos 52w Yahoo Finance 02-jul). Pesos sectoriales, rating, P/E FY1, dividend yield, top holdings e industrias son metadata estática consolidada al 02-jul-2026 y deben revisarse periódicamente. No es recomendación de inversión.
+    </footer>
+  </div>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

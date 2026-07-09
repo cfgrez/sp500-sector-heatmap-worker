@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>S&P 500 Sector Heatmap — Snapshot 07-jul-2026</title>
+<style>
+:root{
+  --bg:#07111f; --panel:#0c1728; --panel2:#101e33; --muted:#90a4bd; --text:#eef5ff;
+  --line:rgba(255,255,255,.10); --soft:rgba(255,255,255,.06); --accent:#7dd3fc;
+  --green:#16a34a; --lime:#84cc16; --amber:#f59e0b; --red:#ef4444; --red2:#991b1b;
+  --shadow:0 18px 50px rgba(0,0,0,.34); --radius:22px;
+  --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 12% -10%, rgba(56,189,248,.22), transparent 28%),radial-gradient(circle at 88% 0%, rgba(34,197,94,.14), transparent 25%),linear-gradient(180deg, #081224 0%, #050b14 100%);color:var(--text);font-family:var(--font);min-height:100vh;}
+.wrap{max-width:1480px;margin:0 auto;padding:28px 22px 42px;}
+header{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;align-items:stretch;margin-bottom:18px;}
+.hero,.market-card{background:linear-gradient(145deg, rgba(15,30,52,.92), rgba(7,17,31,.92));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;position:relative;overflow:hidden;}
+.hero:before{content:"";position:absolute;inset:-1px;background:linear-gradient(120deg, rgba(125,211,252,.18), transparent 35%, rgba(34,197,94,.10));pointer-events:none;}
+.eyebrow{position:relative;color:#83d7ff;font-size:12px;text-transform:uppercase;letter-spacing:.14em;margin-bottom:10px;font-weight:800}
+h1{font-size:clamp(30px,4vw,54px);line-height:.96;margin:0 0 10px;letter-spacing:-1.8px;position:relative;}
+.subtitle{color:#b7c7db;font-size:15px;line-height:1.55;max-width:920px;position:relative;margin:0;}
+code{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:7px;padding:1px 6px;color:#dff5ff}
+.source-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;position:relative;}
+.source-chip{display:inline-flex;gap:7px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:#cfe3f9;font-size:12px;}
+.source-chip.compact{margin:0}.source-chip.warn{border-color:rgba(245,158,11,.55);color:#fde9b0}.source-chip.ok{border-color:rgba(34,197,94,.45);color:#c5f8d3}
+.pills{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+.pill{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:18px;padding:14px 14px 13px;}
+.pill .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.pill .value{font-size:28px;font-weight:850;margin-top:4px;}.pill .price{font-size:12px;color:#dbe9f8;margin-top:2px}.pill .sub{font-size:11px;color:#98abc1;margin-top:3px;}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}.market-card h2{font-size:15px;letter-spacing:.3px;text-transform:uppercase;color:#cfe3f9;margin:0;}
+.legend{height:16px;border-radius:999px;background:linear-gradient(90deg,#991b1b 0%,#ef4444 18%,#f59e0b 45%,#84cc16 70%,#16a34a 100%);border:1px solid rgba(255,255,255,.18);margin:14px 0 8px;}.legend-labels{display:flex;justify-content:space-between;font-size:11px;color:#a9bcd2;}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0;align-items:center;}.controls span{color:#aebfd4;font-size:13px;margin-right:2px;}
+button{border:1px solid var(--line);background:rgba(255,255,255,.07);color:#eaf4ff;border-radius:999px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;transition:.18s ease;}button:hover{transform:translateY(-1px);background:rgba(125,211,252,.12);border-color:rgba(125,211,252,.45)}button.active{background:linear-gradient(135deg, rgba(14,165,233,.55), rgba(34,197,94,.38));border-color:rgba(125,211,252,.65);}button.refresh{background:rgba(14,165,233,.22);border-color:rgba(125,211,252,.45)}button.refresh:disabled{opacity:.65;cursor:wait;transform:none}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;align-items:start;}
+.card{grid-column:span 3;background:linear-gradient(180deg, rgba(16,30,51,.96), rgba(9,18,32,.98));border:1px solid var(--line);border-radius:24px;box-shadow:0 12px 36px rgba(0,0,0,.25);overflow:hidden;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;position:relative;}
+.card:hover{transform:translateY(-3px);border-color:rgba(125,211,252,.45);box-shadow:0 20px 48px rgba(0,0,0,.35);}
+.card.big{grid-column:span 6}.card.med{grid-column:span 4}.card.small{grid-column:span 3}
+.card-inner{padding:18px;}
+.sector-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px;}
+.sector-name{font-size:18px;font-weight:850;line-height:1.05;letter-spacing:-.4px;}
+.sector-en{font-size:11px;color:#8ca0b8;margin-top:4px;}
+.etf{font-size:13px;font-weight:850;color:#06101d;background:#e6f5ff;padding:6px 9px;border-radius:11px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);}
+.metrics-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 12px;}
+.weight{font-size:13px;color:#c7d8ea}.weight b{font-size:18px;color:#fff;}
+.badge{font-size:12px;font-weight:850;padding:7px 9px;border-radius:999px;color:#fff;border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 -1px 0 rgba(0,0,0,.18);white-space:nowrap;}
+.rating{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#dceaff;background:rgba(255,255,255,.06);border:1px solid var(--line);padding:7px 9px;border-radius:999px;margin-bottom:12px;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.perf-wrap{margin:8px 0 14px;}.perf-label{display:flex;justify-content:space-between;color:#96a9c0;font-size:11px;margin-bottom:6px;}
+.bar-bg{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.08);}.bar{height:100%;border-radius:999px;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.stat{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.075);border-radius:14px;padding:10px 8px;min-height:58px;}
+.stat .k{font-size:10px;color:#8fa2b9;text-transform:uppercase;letter-spacing:.65px;}.stat .v{font-size:15px;font-weight:850;margin-top:4px;}
+.expand{display:none;border-top:1px solid var(--line);background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015));padding:16px 18px 18px;}
+.card.open .expand{display:block;}
+.expand-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.box{background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px;}
+.box h3{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:#bcd0e7;margin:0 0 10px;}
+.holding{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:8px 0;color:#dfeaf8;font-size:13px;}
+.mini-bar{height:6px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-top:4px;grid-column:1/3}
+.mini-bar span{display:block;height:100%;background:rgba(125,211,252,.58);border-radius:999px;}
+.break{display:grid;gap:8px}
+.break-row{display:grid;grid-template-columns:110px 1fr 58px;gap:9px;align-items:center;font-size:12px;color:#dce8f6}
+.break-bg{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.break-bg span{display:block;height:100%;background:rgba(34,197,94,.55);border-radius:999px;}
+.range{margin-top:10px}
+.range-line{height:9px;border-radius:999px;background:linear-gradient(90deg,#ef4444,#f59e0b,#16a34a);position:relative;border:1px solid rgba(255,255,255,.16);}
+.knob{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 0 4px rgba(255,255,255,.18)}
+.range-label{display:flex;justify-content:space-between;font-size:11px;color:#a7bad1;margin-top:7px;gap:8px;}
+.note{font-size:11px;color:#90a4bd;line-height:1.45;margin-top:10px;}
+.tiny{font-size:11px;color:#90a4bd;margin-top:8px;line-height:1.4}
+footer{margin-top:24px;color:#9db0c7;font-size:12px;line-height:1.6;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:18px;padding:14px 16px;}
+footer b{color:#cfe3f9}
+.empty{display:none;text-align:center;color:#9eb1c7;padding:40px;border:1px dashed rgba(255,255,255,.14);border-radius:20px;}
+.loading{opacity:.55;filter:saturate(.75)}
+@media(max-width:1100px){header{grid-template-columns:1fr}.card.big,.card.med,.card.small,.card{grid-column:span 6}.expand-grid{grid-template-columns:1fr}}
+@media(max-width:720px){.wrap{padding:18px 12px 28px}.pills{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.card.big,.card.med,.card.small,.card{grid-column:span 1}.stat-grid{grid-template-columns:repeat(2,1fr)}.controls{position:sticky;top:0;z-index:5;background:rgba(5,11,20,.86);backdrop-filter:blur(12px);padding:10px 0}.hero,.market-card{padding:18px}.break-row{grid-template-columns:95px 1fr 50px}.range-label{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <section class="hero">
+      <div class="eyebrow" id="mode-eyebrow">Archivo autocontenido · snapshot embebido</div>
+      <h1>S&P 500 Sector Heatmap</h1>
+      <p class="subtitle">Dashboard interactivo de los 11 sectores GICS usando ETFs Select Sector SPDR como proxy. Esta versión es un solo archivo HTML descargable: los datos de mercado vienen embebidos como snapshot con fecha y fuente explícitas. Si configuras <code>WORKER_URL</code> al inicio del script, intentará datos live desde tu Worker de Cloudflare y usará el snapshot como respaldo.</p>
+      <div class="source-row">
+        <span class="source-chip" id="data-chip">Cargando…</span>
+        <button class="refresh" id="refresh-btn" type="button">Actualizar ahora</button>
+      </div>
+    </section>
+    <aside class="market-card">
+      <div class="topline"><h2>Índices / proxies</h2><span class="source-chip compact">YTD 2026</span></div>
+      <div class="pills" id="pills"></div>
+      <div class="legend"></div>
+      <div class="legend-labels"><span>Peor / rojo</span><span>Neutral</span><span>Mejor / verde</span></div>
+    </aside>
+  </header>
+
+  <div class="controls">
+    <span>Ordenar por:</span>
+    <button data-sort="ytd" class="active">YTD</button>
+    <button data-sort="oneY">1 año</button>
+    <button data-sort="weight">Peso</button>
+    <button data-sort="pe">P/E</button>
+    <button data-sort="divYield">Dividendo</button>
+  </div>
+
+  <main class="grid" id="grid"></main>
+  <div class="empty" id="empty">No hay sectores para mostrar.</div>
+
+  <footer>
+    <b>Fecha y fuentes del snapshot embebido:</b><br>
+    · <b>Precios y retornos sectoriales (YTD / 6M / 1Y, retorno de precio):</b> The Trading Tools — Sector Performance, cierres al <b>07-jul-2026</b>.<br>
+    · <b>Índices:</b> SPY US$ 747.71 y YTD +9.65% al cierre 07-jul-2026 (misma fuente); QQQ US$ 712.22 (intradía 09-jul-2026, Robinhood) con YTD +16.27% y IWM US$ 295.52 (07-jul-2026) con YTD +21.39% — YTD de QQQ/IWM son <b>retorno total</b> al 02-jul-2026 (Total Real Returns), por lo que la metodología difiere levemente de la sectorial.<br>
+    · <b>Rangos 52 semanas:</b> Yahoo Finance al 02-jul-2026 (IWM y QQQ al 07/09-jul-2026), ajustados si el cierre reciente los excedió.<br>
+    · <b>Metadata estática</b> (peso sectorial, rating, P/E FY1, dividend yield, top holdings, industrias, concentración): consolidada al 02-jul-2026 desde fichas de los Select Sector SPDR; no se actualiza automáticamente.<br>
+    Los ETFs sectoriales son proxies líquidos de los sectores GICS del S&P 500; sus retornos pueden diferir levemente de los índices oficiales. Datos gratuitos pueden venir con retraso. <b>No es recomendación de inversión.</b>
+  </footer>
+</div>
+
+<script>
+/* ==========================================================================
+   CONFIGURACIÓN LIVE (opcional)
+   Si desplegaste el Worker de Cloudflare (sp500-sector-heatmap-worker),
+   pega aquí su URL base, p. ej.:
+     const WORKER_URL = "https://sp500-sector-heatmap-worker.TU-SUBDOMINIO.workers.dev";
+   Con WORKER_URL vacío, el dashboard usa solo el SNAPSHOT embebido.
+   ========================================================================== */
+const WORKER_URL = "";
+
+/* ==========================================================================
+   SNAPSHOT EMBEBIDO — generado el 09-jul-2026
+   Retornos sectoriales (precio): The Trading Tools, cierre 07-jul-2026.
+   QQQ/IWM YTD (retorno total al 02-jul-2026): Total Real Returns.
+   Metadata estática: fichas Select Sector SPDR consolidadas al 02-jul-2026.
+   ========================================================================== */
+const SNAPSHOT = {
+  ok: true,
+  generatedAt: "2026-07-09T12:00:00Z",
+  latestMarketDate: "2026-07-07",
+  note: "Snapshot embebido en el archivo — no se actualiza solo.",
+  pills: [
+    { label:"S&P 500 / SPY",     symbol:"SPY", sub:"proxy ETF · YTD precio", price:747.71, ytd:9.65,  asOf:"2026-07-07", source:"The Trading Tools" },
+    { label:"NASDAQ 100 / QQQ",  symbol:"QQQ", sub:"proxy ETF · YTD ret. total", price:712.22, ytd:16.27, asOf:"2026-07-09", source:"Robinhood / Total Real Returns" },
+    { label:"Russell 2000 / IWM",symbol:"IWM", sub:"proxy ETF · YTD ret. total", price:295.52, ytd:21.39, asOf:"2026-07-07", source:"Robinhood / Total Real Returns" }
+  ],
+  sectors: [
+    {name:"Tecnología de la información", en:"Information Technology", etf:"XLK", weight:38.6, rating:"Neutral", pe:29.30, divYield:0.39, top3:45.6, top10:68.5, wamc:1657714.40,
+     price:179.18, ytd:24.46, sixM:24.17, oneY:39.46, range:[126.60,198.73], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["NVIDIA",12.83],["Apple",11.59],["Microsoft",7.65],["Broadcom",4.69],["AMD",4.51]],
+     industries:[["Semiconductores",47.31],["Software",21.61],["Hardware tecnológico",17.89],["Equipos comunicación",5.60],["Equipo electrónico",4.78],["Servicios TI",2.80]]},
+    {name:"Energía", en:"Energy", etf:"XLE", weight:3.1, rating:"Neutral", pe:11.88, divYield:2.84, top3:43.2, top10:64.7, wamc:205599.69,
+     price:54.64, ytd:22.21, sixM:19.69, oneY:25.55, range:[42.05,63.46], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["Exxon Mobil",20.36],["Chevron",14.49],["ConocoPhillips",5.88],["Marathon Petroleum",4.66],["Valero Energy",4.61]],
+     industries:[["Petróleo/gas/combustibles",89.89],["Equipos y servicios energía",10.11]]},
+    {name:"Industriales", en:"Industrials", etf:"XLI", weight:8.3, rating:"Más favorecido", pe:27.23, divYield:0.98, top3:14.5, top10:29.5, wamc:158179.86,
+     price:182.38, ytd:17.57, sixM:15.44, oneY:22.06, range:[147.14,186.09], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["Caterpillar",8.02],["GE Aerospace",6.87],["GE Vernova",5.35],["RTX",4.53],["Boeing",3.02]],
+     industries:[["Aeroespacial/defensa",25.82],["Maquinaria",21.43],["Equipo eléctrico",14.26],["Transporte terrestre",9.70],["Productos construcción",5.52]]},
+    {name:"Materiales", en:"Materials", etf:"XLB", weight:1.8, rating:"Más favorecido", pe:17.34, divYield:1.74, top3:27.5, top10:53.4, wamc:78347.88,
+     price:51.51, ytd:13.58, sixM:11.69, oneY:12.74, range:[42.04,54.14], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["Linde",14.42],["Newmont",5.82],["Freeport-McMoRan",5.09],["Sherwin-Williams",4.95],["Corteva",4.88]],
+     industries:[["Químicos",52.48],["Metales y minería",18.33],["Envases y embalajes",15.33],["Materiales construcción",13.86]]},
+    {name:"Bienes raíces", en:"Real Estate", etf:"XLRE", weight:1.8, rating:"Menos favorecido", pe:35.96, divYield:3.23, top3:23.8, top10:48.6, wamc:64667.20,
+     price:44.89, ytd:11.25, sixM:11.17, oneY:7.39, range:[39.73,45.65], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["Welltower",11.12],["Prologis",8.73],["Equinix",6.84],["American Tower",5.29],["Simon Property Group",4.95]],
+     industries:[["REITs especializados",38.57],["REITs salud",18.08],["REITs retail",13.59],["REITs residenciales",12.98],["REITs industriales",8.76],["Gestión/desarrollo inmob.",5.44]]},
+    {name:"Consumo básico", en:"Consumer Staples", etf:"XLP", weight:4.5, rating:"Neutral", pe:20.22, divYield:2.63, top3:45.4, top10:76.5, wamc:230834.72,
+     price:84.86, ytd:9.24, sixM:9.23, oneY:3.26, range:[75.16,90.14], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["Walmart",10.36],["Costco",8.91],["Procter & Gamble",7.45],["Coca-Cola",6.83],["Philip Morris",6.01]],
+     industries:[["Distribución/retail básico",32.81],["Bebidas",20.77],["Productos hogar",16.90],["Alimentos",15.23],["Tabaco",10.55],["Cuidado personal",3.74]]},
+    {name:"Servicios públicos", en:"Utilities", etf:"XLU", weight:2.1, rating:"Menos favorecido", pe:18.61, divYield:2.67, top3:24.0, top10:52.0, wamc:70597.19,
+     price:45.70, ytd:7.05, sixM:5.84, oneY:11.68, range:[40.17,47.80], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["NextEra Energy",12.85],["Southern",7.65],["Duke Energy",6.99],["Constellation Energy",5.39],["American Electric Power",5.24]],
+     industries:[["Eléctricas",65.03],["Multi-utilities",26.84],["IPP/renovables",4.22],["Gas utilities",2.07],["Agua utilities",1.84]]},
+    {name:"Salud", en:"Health Care", etf:"XLV", weight:8.3, rating:"Más favorecido", pe:19.09, divYield:1.59, top3:28.8, top10:49.9, wamc:371254.25,
+     price:164.44, ytd:6.23, sixM:5.74, oneY:21.36, range:[127.96,164.44], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["Eli Lilly",16.34],["Johnson & Johnson",10.59],["AbbVie",7.69],["UnitedHealth",6.71],["Merck",5.37]],
+     industries:[["Farmacéuticas",37.59],["Servicios/proveedores salud",19.14],["Biotecnología",18.40],["Equipos salud",15.57],["Life sciences tools",8.83],["Tecnología salud",0.48]]},
+    {name:"Financieros", en:"Financials", etf:"XLF", weight:11.3, rating:"Neutral", pe:16.09, divYield:1.37, top3:25.7, top10:48.1, wamc:405489.25,
+     price:56.05, ytd:2.34, sixM:2.04, oneY:5.38, range:[47.67,56.52], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["Berkshire Hathaway B",11.83],["JPMorgan Chase",11.56],["Visa A",7.52],["Mastercard A",5.44],["Bank of America",4.92]],
+     industries:[["Bancos",28.98],["Servicios financieros",27.84],["Mercados de capitales",25.29],["Seguros",13.52],["Crédito consumo",4.38]]},
+    {name:"Consumo discrecional", en:"Consumer Discretionary", etf:"XLY", weight:9.7, rating:"Menos favorecido", pe:26.04, divYield:0.76, top3:56.5, top10:68.6, wamc:963934.50,
+     price:117.39, ytd:-1.69, sixM:-0.81, oneY:6.13, range:[105.19,125.01], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["Amazon",22.39],["Tesla",19.74],["Home Depot",5.76],["McDonald's",4.11],["TJX Companies",3.89]],
+     industries:[["Hoteles/rest./ocio",25.26],["Retail amplio",23.64],["Automóviles",22.76],["Retail especializado",20.79],["Bienes durables hogar",3.52],["Textiles/lujo",3.03]]},
+    {name:"Servicios de comunicación", en:"Communication Services", etf:"XLC", weight:10.4, rating:"Más favorecido", pe:14.28, divYield:1.15, top3:83.3, top10:93.6, wamc:1200550.00,
+     price:111.02, ytd:-5.69, sixM:-5.03, oneY:2.76, range:[105.03,120.41], asOf:"2026-07-07", marketSource:"The Trading Tools (cierre)",
+     holdings:[["Meta Platforms A",17.97],["Alphabet A",10.97],["Alphabet C",8.76],["Take-Two Interactive",4.48],["Live Nation",4.46]],
+     industries:[["Interactive media",37.76],["Entertainment",28.88],["Media",16.22],["Telecom diversificada",12.73],["Telecom inalámbrica",4.41]]}
+  ]
+};
+
+/* ========================================================================== */
+let currentSort = 'ytd';
+let state = SNAPSHOT;
+let liveMode = false;
+
+const grid = document.getElementById('grid');
+const pillsEl = document.getElementById('pills');
+const chip = document.getElementById('data-chip');
+const refreshBtn = document.getElementById('refresh-btn');
+const eyebrow = document.getElementById('mode-eyebrow');
+
+function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+function mix(a,b,t){
+  const ah=parseInt(a.slice(1),16), ar=ah>>16&255, ag=ah>>8&255, ab=ah&255;
+  const bh=parseInt(b.slice(1),16), br=bh>>16&255, bg=bh>>8&255, bb=bh&255;
+  const rr=Math.round(ar+(br-ar)*t), rg=Math.round(ag+(bg-ag)*t), rb=Math.round(ab+(bb-ab)*t);
+  return `rgb(${rr},${rg},${rb})`;
+}
+function perfColor(v){
+  if(!Number.isFinite(v)) return '#94a3b8';
+  const min=-25, max=35; const t=clamp((v-min)/(max-min),0,1);
+  if(t<.33){return mix('#991b1b','#ef4444',t/.33)}
+  if(t<.58){return mix('#ef4444','#f59e0b',(t-.33)/.25)}
+  if(t<.78){return mix('#f59e0b','#84cc16',(t-.58)/.20)}
+  return mix('#84cc16','#16a34a',(t-.78)/.22)
+}
+function fmtPct(v){return Number.isFinite(v) ? `${v>0?'+':''}${v.toFixed(Math.abs(v)>=10?1:2)}%` : 'N/D';}
+function fmtPrice(v){return Number.isFinite(v) ? `US$ ${v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}` : 'N/D';}
+function fmtNum(v){return Number.isFinite(v) ? v.toLocaleString('en-US',{maximumFractionDigits:2}) : 'N/D';}
+function fmtDate(d){
+  if(!d) return 'sin fecha';
+  const date = new Date(`${d}T12:00:00Z`);
+  return date.toLocaleDateString('es-CL', { day:'2-digit', month:'short', year:'numeric', timeZone:'America/Santiago' });
+}
+function fmtTs(ts){
+  if(!ts) return '';
+  return new Date(ts).toLocaleString('es-CL', { dateStyle:'medium', timeStyle:'short' });
+}
+function ratingColor(r){return r.includes('Más')?'#22c55e':r.includes('Menos')?'#f59e0b':'#60a5fa';}
+function cardSize(w){ if(w>=20) return 'big'; if(w>=8) return 'med'; return 'small'; }
+function pctPos(price,range){return Array.isArray(range) && range[1] > range[0] ? clamp(((price-range[0])/(range[1]-range[0]))*100,0,100) : 50;}
+function performanceBarWidth(v){return clamp((v + 25) / 60 * 100, 0, 100);}
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+}
+
+function renderPills(){
+  pillsEl.innerHTML = state.pills.map(p=>`
+    <div class="pill">
+      <div class="label">${escapeHtml(p.label)}</div>
+      <div class="value" style="color:${perfColor(p.ytd)}">${fmtPct(p.ytd)}</div>
+      <div class="price">${fmtPrice(p.price)}</div>
+      <div class="sub">${escapeHtml(p.sub || '')} · ${fmtDate(p.asOf)}</div>
+    </div>
+  `).join('');
+}
+
+function render(){
+  const sorted=[...state.sectors].sort((a,b)=>{
+    if(currentSort==='ytd') return (b.ytd ?? -999)-(a.ytd ?? -999);
+    if(currentSort==='oneY') return (b.oneY ?? -999)-(a.oneY ?? -999);
+    if(currentSort==='weight') return b.weight-a.weight;
+    if(currentSort==='pe') return b.pe-a.pe;
+    if(currentSort==='divYield') return b.divYield-a.divYield;
+    return 0;
+  });
+  document.getElementById('empty').style.display = sorted.length ? 'none' : 'block';
+  grid.innerHTML = sorted.map(s=>{
+    const col=perfColor(s.ytd), barWidth=performanceBarWidth(s.ytd), rpos=pctPos(s.price,s.range);
+    const rest = Math.max(0,100-s.top10);
+    const marketSource = s.marketSource ? `Mercado: ${s.marketSource} · ${fmtDate(s.asOf)}` : `Mercado: ${fmtDate(s.asOf)}`;
+    return `<article class="card ${cardSize(s.weight)}" onclick="this.classList.toggle('open')">
+      <div class="card-inner">
+        <div class="sector-head"><div><div class="sector-name">${escapeHtml(s.name)}</div><div class="sector-en">${escapeHtml(s.en)}</div></div><div class="etf">${escapeHtml(s.etf)}</div></div>
+        <div class="metrics-row"><div class="weight">Peso S&P <b>${s.weight.toFixed(1)}%</b></div><div class="badge" style="background:${col}">YTD ${fmtPct(s.ytd)}</div></div>
+        <div class="rating"><span class="dot" style="background:${ratingColor(s.rating)}"></span>Rating: <b>${escapeHtml(s.rating)}</b></div>
+        <div class="perf-wrap"><div class="perf-label"><span>Performance YTD</span><span>${fmtPct(s.ytd)}</span></div><div class="bar-bg"><div class="bar" style="width:${barWidth}%;background:${col}"></div></div></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="k">Precio</div><div class="v">${fmtPrice(s.price)}</div></div>
+          <div class="stat"><div class="k">P/E FY1</div><div class="v">${s.pe.toFixed(2)}x</div></div>
+          <div class="stat"><div class="k">Div Yield</div><div class="v">${s.divYield.toFixed(2)}%</div></div>
+          <div class="stat"><div class="k">6M</div><div class="v" style="color:${perfColor(s.sixM)}">${fmtPct(s.sixM)}</div></div>
+          <div class="stat"><div class="k">1Y</div><div class="v" style="color:${perfColor(s.oneY)}">${fmtPct(s.oneY)}</div></div>
+          <div class="stat"><div class="k">Fecha</div><div class="v">${fmtDate(s.asOf)}</div></div>
+        </div>
+        <div class="tiny">${escapeHtml(marketSource)}</div>
+      </div>
+      <div class="expand">
+        <div class="expand-grid">
+          <div class="box"><h3>Top 5 holdings</h3>${s.holdings.map(h=>`<div class="holding"><span>${escapeHtml(h[0])}</span><b>${h[1].toFixed(2)}%</b><div class="mini-bar"><span style="width:${Math.min(100,h[1]*4)}%"></span></div></div>`).join('')}</div>
+          <div class="box"><h3>Breakdown market cap / concentración</h3><div class="break">
+            <div class="break-row"><span>Top 3</span><div class="break-bg"><span style="width:${s.top3}%"></span></div><b>${s.top3.toFixed(1)}%</b></div>
+            <div class="break-row"><span>Top 10</span><div class="break-bg"><span style="width:${s.top10}%"></span></div><b>${s.top10.toFixed(1)}%</b></div>
+            <div class="break-row"><span>Resto</span><div class="break-bg"><span style="width:${rest}%"></span></div><b>${rest.toFixed(1)}%</b></div>
+            <div class="note">Wtd. avg. market cap: US$ ${fmtNum(s.wamc)} MM · Metadata estática al 02-jul-2026</div>
+            <div class="range"><h3 style="margin-top:12px">Rango 52 semanas ${escapeHtml(s.etf)}</h3><div class="range-line"><span class="knob" style="left:${rpos}%"></span></div><div class="range-label"><span>${fmtPrice(s.range?.[0])}</span><span>Actual ${fmtPrice(s.price)}</span><span>${fmtPrice(s.range?.[1])}</span></div></div>
+          </div></div>
+        </div>
+        <div class="box" style="margin-top:14px"><h3>Industria / subsectores</h3>${s.industries.map(i=>`<div class="break-row"><span style="min-width:135px">${escapeHtml(i[0])}</span><div class="break-bg"><span style="width:${Math.min(100,i[1])}%"></span></div><b>${i[1].toFixed(2)}%</b></div>`).join('')}</div>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function updateChip(){
+  chip.classList.remove('ok','warn');
+  if(liveMode){
+    chip.classList.add('ok');
+    chip.textContent = `LIVE vía Worker · mercado al ${fmtDate(state.latestMarketDate)} · API ${fmtTs(state.generatedAt)}`;
+    eyebrow.textContent = 'Datos live desde Cloudflare Worker';
+  }else{
+    chip.classList.add('warn');
+    chip.textContent = `SNAPSHOT embebido · mercado al ${fmtDate(state.latestMarketDate)} · generado 09-jul-2026`;
+    eyebrow.textContent = 'Archivo autocontenido · snapshot embebido';
+  }
+}
+
+async function loadMarket(forceFresh=false){
+  if(!WORKER_URL){
+    // Sin worker configurado: solo snapshot
+    liveMode = false;
+    state = SNAPSHOT;
+    renderPills(); render(); updateChip();
+    if(forceFresh){
+      chip.textContent = 'Sin WORKER_URL configurada — mostrando snapshot del 07-jul-2026. Edita WORKER_URL en el script para datos live.';
+    }
+    return;
+  }
+  refreshBtn.disabled = true;
+  refreshBtn.textContent = forceFresh ? 'Actualizando...' : 'Cargando...';
+  document.body.classList.add('loading');
+  try{
+    const base = WORKER_URL.replace(/\/+$/,'');
+    const url = forceFresh ? `${base}/api/market?fresh=1&ts=${Date.now()}` : `${base}/api/market?ts=${Date.now()}`;
+    const res = await fetch(url, { cache:'no-store' });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    // Los pills del worker no traen "sub" con metodología; conservar etiquetas locales
+    if(Array.isArray(data.pills)){
+      data.pills = data.pills.map(p=>({ sub:'proxy ETF · live', ...p }));
+    }
+    state = data;
+    liveMode = true;
+    renderPills(); render(); updateChip();
+  }catch(err){
+    console.error(err);
+    liveMode = false;
+    state = SNAPSHOT;
+    renderPills(); render(); updateChip();
+    chip.classList.remove('ok'); chip.classList.add('warn');
+    chip.textContent = `Worker no disponible (${err.message}) — usando snapshot del 07-jul-2026`;
+  }finally{
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = 'Actualizar ahora';
+    document.body.classList.remove('loading');
+  }
+}
+
+document.querySelectorAll('button[data-sort]').forEach(btn=>btn.addEventListener('click',()=>{
+  currentSort=btn.dataset.sort;
+  document.querySelectorAll('button[data-sort]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}));
+refreshBtn.addEventListener('click', () => loadMarket(true));
+loadMarket();
+</script>
+</body>
+</html>
